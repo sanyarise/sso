@@ -1,0 +1,11 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:sso}/storage/sso.db",
+            "name": "ssodb"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

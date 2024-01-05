@@ -3,7 +3,11 @@ package main
 import (
 	"log/slog"
 	"os"
-	"sso/internal/config"
+	"os/signal"
+	"syscall"
+
+	"github.com/sanyarise/sso/internal/app"
+	"github.com/sanyarise/sso/internal/config"
 )
 
 const (
@@ -23,6 +27,21 @@ func main() {
 	)
 	log.Debug("debug message")
 	log.Error("error message")
+
+	application := app.New(log, cfg.GRPC.Port, cfg.StoragePath, cfg.TokenTTL)
+
+	go application.GRPCSrv.MustRun()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+
+	sign := <-stop
+
+	log.Info("stopping application", slog.String("signal", sign.String()))
+
+	application.GRPCSrv.Stop()
+
+	log.Info("application stopped")
 }
 
 func setupLogger(env string) *slog.Logger {
